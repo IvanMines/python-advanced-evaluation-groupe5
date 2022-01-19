@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import notebook_v0 as toolbox
 import unittest
 
 from notebook_v1 import *
+import notebook_v0 as toolbox
+from notebook_v0_test import strip_last_lines
 
 class Question9(unittest.TestCase):
     def test_build_code_cell(self):
@@ -39,11 +42,20 @@ class Question9(unittest.TestCase):
         nb = Notebook(ipynb)
         self.assertEqual("4.5", nb.version)
 
+    def test_cell_type(self):
+        ipynb = toolbox.load_ipynb("samples/hello-world.ipynb")
+        nb = Notebook(ipynb)
+        self.assertIsInstance(nb.cells[0], MarkdownCell)
+        self.assertIsInstance(nb.cells[1], CodeCell)
+        self.assertIsInstance(nb.cells[2], MarkdownCell)
+
+class Question9Bonus(unittest.TestCase):
     def test_build_notebook_hello_world(self):
         ipynb = toolbox.load_ipynb("samples/hello-world.ipynb")
         nb = Notebook(ipynb)
         self.assertIsInstance(nb.cells, list)
-        self.assertIsInstance(nb.cells[0], Cell)
+        for cell in nb.cells:
+            self.assertIsInstance(cell, Cell)
 
 class Question10(unittest.TestCase):
     def test_from_file(self):
@@ -64,19 +76,19 @@ class Question12(unittest.TestCase):
         self.assertEqual(
             {'cells': [{'cell_type': 'markdown',
                 'id': 'a9541506',
-                'medatada': {},
+                'metadata': {},
                 'source': ['Hello world!\n',
                            '============\n',
                            'Print `Hello world!`:']},
                {'cell_type': 'code',
                 'execution_count': 1,
                 'id': 'b777420a',
-                'medatada': {},
+                'metadata': {},
                 'outputs': [],
                 'source': ['print("Hello world!")']},
                {'cell_type': 'markdown',
                 'id': 'a23ab5ac',
-                'medatada': {},
+                'metadata': {},
                 'source': ['Goodbye! 👋']}],
             'metadata': {},
             'nbformat': 4,
@@ -97,7 +109,7 @@ print("Hello world!")
 
 # %% [markdown]
 # Goodbye! 👋"""
-            , ppp.to_py_percent())
+            , strip_last_lines(ppp.to_py_percent()))
 
 class Question14(unittest.TestCase):
     def test_outliner(self):
@@ -113,7 +125,7 @@ class Question14(unittest.TestCase):
     | print("Hello world!")
 └─▶ Markdown cell #a23ab5ac
     | Goodbye! 👋"""
-            , o.outline()
+            , strip_last_lines(o.outline())
             )
 
 if __name__ == "__main__":

@@ -7,6 +7,11 @@ import numpy as np
 
 from notebook_v0 import *
 
+def strip_last_lines(s):
+    while s and s.endswith("\n"):
+        s = s[:-1]
+    return s
+
 class Question1(unittest.TestCase):
     def test_load_ipynb_minimal(self):
         ipynb = load_ipynb("samples/minimal.ipynb")
@@ -172,14 +177,13 @@ class Question3(unittest.TestCase):
 print("Hello world!")
 
 # %% [markdown]
-# Goodbye! 👋
-""",
-            to_percent(ipynb),
+# Goodbye! 👋""",
+            strip_last_lines(to_percent(ipynb)),
         )
 
     def test_to_starboard_text(self):
         ipynb = load_ipynb("samples/hello-world.ipynb")
-        with open("output.txt", "w") as f:
+        with open("output.txt", "w", encoding="utf-8") as f:
             f.write(to_starboard(ipynb))
         self.assertEqual(
             r"""# %% [markdown]
@@ -190,16 +194,14 @@ Print `Hello world!`:
 print("Hello world!")
 # %% [markdown]
 Goodbye! 👋""",
-            to_starboard(ipynb),
+            strip_last_lines(to_starboard(ipynb)),
         )
 
 class Question4(unittest.TestCase):
     def test_to_starboard_html(self):
         self.maxDiff = None
         ipynb = load_ipynb("samples/hello-world.ipynb")
-        self.assertEqual(
-            """
-<!doctype html>
+        begin_with = """<!doctype html>
 <html>
     <head>
         <meta charset="utf-8">
@@ -210,15 +212,18 @@ class Question4(unittest.TestCase):
     </head>
     <body>
         <script>
-            window.initialNotebookContent = '# %% [markdown]\\nHello world!\\n============\\nPrint `Hello world!`:\\n# %% [python]\\nprint("Hello world!")\\n# %% [markdown]\\nGoodbye! 👋'
+            window.initialNotebookContent = '"""
+        starboard_code = '# %% [markdown]\\nHello world!\\n============\\nPrint `Hello world!`:\\n# %% [python]\\nprint("Hello world!")\\n# %% [markdown]\\nGoodbye! 👋'
+        ends_with = """'
             window.starboardArtifactsUrl = `https://cdn.jsdelivr.net/npm/starboard-notebook@0.15.2/dist/`;
         </script>
         <script src="https://cdn.jsdelivr.net/npm/starboard-notebook@0.15.2/dist/starboard-notebook.js"></script>
     </body>
-</html>
-""",
-            to_starboard(ipynb, html=True),
-        )
+</html>"""
+        html = to_starboard(ipynb, html=True)
+        self.assertIn(begin_with, html)
+        self.assertIn(starboard_code, html)
+        self.assertIn(ends_with, html)
 
 class Question5(unittest.TestCase):
     def test_clear_output(self):

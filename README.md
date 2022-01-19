@@ -140,6 +140,7 @@ Pour faciliter la manipulation de notebooks Jupyter en Python :
 
   - 🚀 **Développez les fonctions `load_ipynb` et `save_ipynb`.**
 
+
 ### **Question 2**: À la racine des notebooks
 
 Etudiez la structure de haut-niveau des notebooks ipynb, puis :
